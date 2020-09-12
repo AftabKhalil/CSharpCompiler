@@ -6,7 +6,7 @@ public class Program
 		char x = '\n', y = 'a';
 		int a,b = 10 + ( 20 * 30);					//Integer decleration
 		float b = 10e-4 / 12.5 + a * b;				//Float   decleretion
-		string b ABC = "Hello \"World\" and \n happy coding.";	//string  decleration
+		string b = "Hello \"World\" and \n happy coding.";	//string  decleration
 
 		/*above was only decleration lets go with for loop
 		  it is like a basic block of programming*/
