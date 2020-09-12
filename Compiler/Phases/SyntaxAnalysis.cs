@@ -919,9 +919,9 @@ namespace Compiler.Phases
 
         private bool ThrowSyntaxError(string requiredToken)
         {
-            string errorString = string.Format("Require token {0} at line {1} instead of token {2}", requiredToken, Tokens[i].LineNumber, Tokens[i].ValueString);
+            string errorString = string.Format("Require token '{0}' at line {1} instead of token '{2}'", requiredToken, Tokens[i].LineNumber, Tokens[i].Value);
             if (i-- != -1)
-                errorString += string.Format(", after token {0}", Tokens[i].ValueString);
+                errorString += string.Format(", after token '{0}'", Tokens[i].Value);
             throw new Exception(errorString);
         }
     }
