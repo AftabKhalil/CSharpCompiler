@@ -11,7 +11,8 @@ namespace Compiler
         static void Main(string[] args)
         {
             //Read file
-            MyFileReader myFileReader = new MyFileReader("C://Samples//First.txt");
+            string sampleFileName = "First.txt";
+            MyFileReader myFileReader = new MyFileReader(sampleFileName);
             string text = myFileReader.ReadFile();
 
             //Make tokens
@@ -25,6 +26,10 @@ namespace Compiler
             if (!syntaxAnalysisResult.SyntaxParsed)
             {
                 Console.WriteLine(syntaxAnalysisResult.Exception.Message);
+            }
+            else
+            {
+                Console.WriteLine("Syntax Analysis phase passed");
             }
 
 

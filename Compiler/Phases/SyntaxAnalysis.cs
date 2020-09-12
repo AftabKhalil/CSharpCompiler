@@ -49,7 +49,15 @@ namespace Compiler.Phases
                         if (Tokens[i].Type == Constants.CUR_BRACKET_LEFT)
                         {
                             i++;
-                            if (S0()) return true;
+                            if (S0())
+                            {
+                                if (Tokens[i].Type == Constants.CUR_BRACKET_RIGHT)
+                                {
+                                    i++;
+                                    return true;
+                                }
+                                return ThrowSyntaxError(Constants.CUR_BRACKET_RIGHT);
+                            }
                         }
                         return ThrowSyntaxError(Constants.CUR_BRACKET_LEFT);
                     }
@@ -67,7 +75,11 @@ namespace Compiler.Phases
                 i++;
                 if (S1()) return true;
             }
-            return ThrowSyntaxError(Constants.ACCESS_MODIFIER);
+            else if (Tokens[i].Type == Constants.CUR_BRACKET_RIGHT)
+            {
+                return true;
+            }
+            return ThrowSyntaxError(Constants.CUR_BRACKET_RIGHT);
         }
 
         private bool S1()
@@ -83,15 +95,11 @@ namespace Compiler.Phases
                 if (Tokens[i].Type == Constants.IDENTIFIER)
                 {
                     i++;
-                    if (Tokens[i].Type == Constants.SMALL_BRACKET_LEFT)
+                    if (METHOD_DECLARATION())
                     {
-                        i++;
-                        if (METHOD_DECLARATION())
+                        if (S0())
                         {
-                            if (S0())
-                            {
-                                return true;
-                            }
+                            return true;
                         }
                     }
                     return ThrowSyntaxError(Constants.SMALL_BRACKET_LEFT);
@@ -123,25 +131,24 @@ namespace Compiler.Phases
 
         private bool METHOD_DECLARATION()
         {
-            if (Tokens[i].Type == Constants.DATA_TYPE)
+            if (Tokens[i].Type == Constants.SMALL_BRACKET_LEFT)
             {
                 i++;
-            }
-
-            if (Tokens[i].Type == Constants.SMALL_BRACKET_RIGHT)
-            {
-                i++;
-                if (Tokens[i].Type == Constants.CUR_BRACKET_LEFT)
+                if (Tokens[i].Type == Constants.SMALL_BRACKET_RIGHT)
                 {
-                    if (MST())
+                    i++;
+                    if (Tokens[i].Type == Constants.CUR_BRACKET_LEFT)
                     {
-                        return true;
+                        if (MST())
+                        {
+                            return true;
+                        }
                     }
-                    return ThrowSyntaxError(Constants.CUR_BRACKET_RIGHT);
+                    return ThrowSyntaxError(Constants.CUR_BRACKET_LEFT);
                 }
-                return ThrowSyntaxError(Constants.CUR_BRACKET_LEFT);
+                return ThrowSyntaxError(Constants.SMALL_BRACKET_RIGHT);
             }
-            return ThrowSyntaxError(Constants.SMALL_BRACKET_RIGHT);
+            return ThrowSyntaxError(Constants.SMALL_BRACKET_LEFT);
         }
 
         private bool MST()
@@ -173,10 +180,19 @@ namespace Compiler.Phases
                 i++;
                 if (ID_F())
                 {
-                    if (SST())
+                    if (Tokens[i].Type == Constants.TERMINATOR)
+                    {
+                        i++;
+                        if (SST())
+                        {
+                            return true;
+                        }
+                    }
+                    else if (SSTF())
                     {
                         return true;
                     }
+                    return ThrowSyntaxError(Constants.TERMINATOR);
                 }
             }
             //Variable declaration
@@ -307,7 +323,7 @@ namespace Compiler.Phases
 
         private bool SSTF()
         {
-            if (Tokens[i].Type == Constants.CUR_BRACKET_RIGHT || Tokens[i].Type == Constants.IF || Tokens[i].Type == Constants.FOR)
+            if (Tokens[i].Type == Constants.CUR_BRACKET_RIGHT || Tokens[i].Type == Constants.SMALL_BRACKET_RIGHT || Tokens[i].Type == Constants.IF || Tokens[i].Type == Constants.FOR)
             {
                 return true;
             }
@@ -805,6 +821,16 @@ namespace Compiler.Phases
             {
                 i++;
                 return true;
+            }
+
+            if (Tokens[i].Type == Constants.ASSIGNMENT_OPERATOR)
+            {
+                i++;
+                if (E())
+                {
+                    return true;
+                }
+                return ThrowSyntaxError("Expresion");
             }
 
             return false;

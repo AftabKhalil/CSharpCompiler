@@ -6,18 +6,18 @@ namespace Compiler.HelperClasses
     //Class to read a test file
     public class MyFileReader
     {
-        private string path;
+        private string FileName;
 
         //Constructor
-        public MyFileReader(string path)
+        public MyFileReader(string FileName)
         {
-            this.path = path;
+            this.FileName = FileName;
         }
 
         //Function to read and return the entire content of the file in a single string
         public string ReadFile()
         {
-            string text = File.ReadAllText(this.path);
+            string text = File.ReadAllText("..//..//..//Samples//" + this.FileName);
             return text;
         }
     }

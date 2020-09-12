@@ -3,7 +3,6 @@ C:\Users\akhalil\source\repos\Compiler\Compiler\bin\Debug\netcoreapp2.2\Compiler
 C:\Users\akhalil\source\repos\Compiler\Compiler\bin\Debug\netcoreapp2.2\Compiler.runtimeconfig.dev.json
 C:\Users\akhalil\source\repos\Compiler\Compiler\bin\Debug\netcoreapp2.2\Compiler.dll
 C:\Users\akhalil\source\repos\Compiler\Compiler\bin\Debug\netcoreapp2.2\Compiler.pdb
-C:\Users\akhalil\source\repos\Compiler\Compiler\obj\Debug\netcoreapp2.2\Compiler.csprojAssemblyReference.cache
 C:\Users\akhalil\source\repos\Compiler\Compiler\obj\Debug\netcoreapp2.2\Compiler.csproj.CoreCompileInputs.cache
 C:\Users\akhalil\source\repos\Compiler\Compiler\obj\Debug\netcoreapp2.2\Compiler.AssemblyInfoInputs.cache
 C:\Users\akhalil\source\repos\Compiler\Compiler\obj\Debug\netcoreapp2.2\Compiler.AssemblyInfo.cs
