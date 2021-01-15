@@ -30,6 +30,11 @@ namespace Compiler.HelperClasses
         public static string DO = "DO";
         public static string WHILE = "WHILE";
         public static string FOR = "FOR";
+
+        public static string NEW = "NEW";
+        public static string BREAK = "BREAK";
+        public static string RETURN = "RETURN";
+        public static string PRINT = "PRINT";
         public static string VOID = "VOID";
 
         public static string EQUAL = "EQUAL";
@@ -46,6 +51,9 @@ namespace Compiler.HelperClasses
         public static string CUR_BRACKET_RIGHT = "CUR_BRACKET_RIGHT";
         public static string SMALL_BRACKET_LEFT = "SMALL_BRACKET_LEFT";
         public static string SMALL_BRACKET_RIGHT = "SMALL_BRACKET_RIGHT";
+        public static string SQUARE_BRACKET_LEFT = "SQUARE_BRACKET_LEFT";
+        public static string SQUARE_BRACKET_RIGHT = "SQUARE_BRACKET_RIGHT";
+
 
         public static string RELATIONAL_OPERATION = "RELATIONAL_OPERATION";
         public static string LESS_THAN = "LESS_THAN";

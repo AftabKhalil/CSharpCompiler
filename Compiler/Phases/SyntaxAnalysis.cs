@@ -73,7 +73,10 @@ namespace Compiler.Phases
             if (Tokens[i].Type == Constants.ACCESS_MODIFIER)
             {
                 i++;
-                if (S1()) return true;
+                if (S1())
+                {
+                    return true;
+                }
             }
             else if (Tokens[i].Type == Constants.CUR_BRACKET_RIGHT)
             {
@@ -115,7 +118,20 @@ namespace Compiler.Phases
                         i++;
                         if (S2())
                         {
-                            if (S0()) return true;
+                            if (S0())
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                    else if (Tokens[i].Type == Constants.SQUARE_BRACKET_LEFT)
+                    {
+                        if (ARRAY_DECLARATION())
+                        {
+                            if (S0())
+                            {
+                                return true;
+                            }
                         }
                     }
                     return ThrowSyntaxError(Constants.IDENTIFIER);
@@ -126,7 +142,40 @@ namespace Compiler.Phases
 
         private bool S2()
         {
-            return true;
+            if (Tokens[i].Type == Constants.TERMINATOR)
+            {
+                i++;
+                return true;
+            }
+            if (Tokens[i].Type == Constants.SMALL_BRACKET_LEFT)
+            {
+                if (METHOD_DECLARATION())
+                {
+                    return true;
+                }
+            }
+            else if (Tokens[i].Type == Constants.EQUAL)
+            {
+                i++;
+                if (E())
+                {
+                    if (Tokens[i].Type == Constants.COMMA)
+                    {
+                        if (VARIABLE_DECLARATION_1())
+                        {
+                            return true;
+                        }
+                    }
+                    else if (Tokens[i].Type == Constants.TERMINATOR)
+                    {
+                        i++;
+                        return true;
+                    }
+                    return ThrowSyntaxError(Constants.TERMINATOR);
+                }
+            }
+
+            return false;
         }
 
         private bool METHOD_DECLARATION()
@@ -134,6 +183,7 @@ namespace Compiler.Phases
             if (Tokens[i].Type == Constants.SMALL_BRACKET_LEFT)
             {
                 i++;
+                METHOD_DECLARATION_ARGS();
                 if (Tokens[i].Type == Constants.SMALL_BRACKET_RIGHT)
                 {
                     i++;
@@ -151,21 +201,59 @@ namespace Compiler.Phases
             return ThrowSyntaxError(Constants.SMALL_BRACKET_LEFT);
         }
 
+        private bool METHOD_DECLARATION_ARGS()
+        {
+            if (Tokens[i].Type == Constants.SMALL_BRACKET_RIGHT)
+            {
+                return true;
+            }
+
+            if (Tokens[i].Type == Constants.DATA_TYPE)
+            {
+                i++;
+                if (Tokens[i].Type == Constants.IDENTIFIER)
+                {
+                    i++;
+                    if (Tokens[i].Type == Constants.COMMA)
+                    {
+                        i++;
+                        if (Tokens[i].Type == Constants.DATA_TYPE)
+                        {
+                            if (METHOD_DECLARATION_ARGS())
+                            {
+                                return true;
+                            }
+                        }
+                        return ThrowSyntaxError(Constants.DATA_TYPE);
+                    }
+                    if (Tokens[i].Type == Constants.SMALL_BRACKET_RIGHT)
+                    {
+                        return true;
+                    }
+                    return ThrowSyntaxError(Constants.SMALL_BRACKET_RIGHT);
+                }
+                return ThrowSyntaxError(Constants.IDENTIFIER);
+            }
+            return ThrowSyntaxError(Constants.DATA_TYPE);
+        }
+
         private bool MST()
         {
             if (Tokens[i].Type == Constants.CUR_BRACKET_LEFT)
             {
                 i++;
-                if (SST())
+                while (SSTS())
                 {
-                    if (Tokens[i].Type == Constants.CUR_BRACKET_RIGHT)
-                    {
-                        i++;
-                        return true;
-                    }
-                    return ThrowSyntaxError(Constants.CUR_BRACKET_RIGHT);
+                    SST();
                 }
+                if (Tokens[i].Type == Constants.CUR_BRACKET_RIGHT)
+                {
+                    i++;
+                    return true;
+                }
+                return ThrowSyntaxError(Constants.CUR_BRACKET_RIGHT);
             }
+
             else if (SST())
             {
                 return true;
@@ -195,23 +283,22 @@ namespace Compiler.Phases
                     return ThrowSyntaxError(Constants.TERMINATOR);
                 }
             }
+
             //Variable declaration
             else if (Tokens[i].Type == Constants.DATA_TYPE)
             {
                 if (VARIABLE_DECLARATION())
                 {
-                    if (SST())
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
+
             //If statement
             else if (Tokens[i].Type == Constants.IF)
             {
                 if (IF())
                 {
-                    if (SST())
+                    if (MST())
                     {
                         return true;
                     }
@@ -220,14 +307,12 @@ namespace Compiler.Phases
                         i++;
                         if (MST())
                         {
-                            if (SST())
-                            {
-                                return true;
-                            }
+                            return true;
                         }
                     }
                 }
             }
+
             //For loop
             else if (Tokens[i].Type == Constants.FOR)
             {
@@ -314,7 +399,124 @@ namespace Compiler.Phases
                 }
                 return ThrowSyntaxError(Constants.SMALL_BRACKET_LEFT);
             }
+
+            //While loop
+            else if (Tokens[i].Type == Constants.WHILE)
+            {
+                i++;
+                {
+                    if (Tokens[i].Type == Constants.SMALL_BRACKET_LEFT)
+                    {
+                        i++;
+                        if (E())
+                        {
+                            if (Tokens[i].Type == Constants.SMALL_BRACKET_RIGHT)
+                            {
+                                i++;
+                                if (MST())
+                                {
+                                    return true;
+                                }
+                            }
+                            return ThrowSyntaxError(Constants.SMALL_BRACKET_RIGHT);
+                        }
+                    }
+                    return ThrowSyntaxError(Constants.SMALL_BRACKET_LEFT);
+                }
+            }
+
+            //Do while loop
+            if (Tokens[i].Type == Constants.DO)
+            {
+                i++;
+                if (MST())
+                {
+                    if (Tokens[i].Type == Constants.WHILE)
+                    {
+                        i++;
+                        if (Tokens[i].Type == Constants.SMALL_BRACKET_LEFT)
+                        {
+                            i++;
+                            if (E())
+                            {
+                                if (Tokens[i].Type == Constants.SMALL_BRACKET_RIGHT)
+                                {
+                                    i++;
+                                    if (Tokens[i].Type == Constants.TERMINATOR)
+                                    {
+                                        i++;
+                                        return true;
+                                    }
+                                    return ThrowSyntaxError(Constants.TERMINATOR);
+                                }
+                                return ThrowSyntaxError(Constants.SMALL_BRACKET_RIGHT);
+                            }
+                        }
+                        return ThrowSyntaxError(Constants.SMALL_BRACKET_LEFT);
+                    }
+                    return ThrowSyntaxError(Constants.WHILE);
+                }
+            }
+
+            //Print statement
+            if (Tokens[i].Type == Constants.PRINT)
+            {
+                i++;
+                if (Tokens[i].Type == Constants.SMALL_BRACKET_LEFT)
+                {
+                    i++;
+                    if (E())
+                    {
+                        if (Tokens[i].Type == Constants.SMALL_BRACKET_RIGHT)
+                        {
+                            i++;
+                            if (Tokens[i].Type == Constants.TERMINATOR)
+                            {
+                                i++;
+                                return true;
+                            }
+                            return ThrowSyntaxError(Constants.TERMINATOR);
+                        }
+                        return ThrowSyntaxError(Constants.SMALL_BRACKET_RIGHT);
+                    }
+                }
+                return ThrowSyntaxError(Constants.SMALL_BRACKET_LEFT);
+            }
+
+            //Return statement
+            if (Tokens[i].Type == Constants.RETURN)
+            {
+                i++;
+                E();
+                if (Tokens[i].Type == Constants.TERMINATOR)
+                {
+                    i++;
+                    return true;
+                }
+                return ThrowSyntaxError(Constants.TERMINATOR);
+            }
+
+            if (Tokens[i].Type == Constants.BREAK)
+            {
+                i++;
+                if (Tokens[i].Type == Constants.TERMINATOR)
+                {
+                    i++;
+                    return true;
+                }
+                return ThrowSyntaxError(Constants.TERMINATOR);
+            }
+
             else if (SSTF())
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private bool SSTS()
+        {
+            if (Tokens[i].Type == Constants.IDENTIFIER || Tokens[i].Type == Constants.RETURN || Tokens[i].Type == Constants.DATA_TYPE || Tokens[i].Type == Constants.IF || Tokens[i].Type == Constants.FOR || Tokens[i].Type == Constants.WHILE || Tokens[i].Type == Constants.DO || Tokens[i].Type == Constants.PRINT)
             {
                 return true;
             }
@@ -323,7 +525,7 @@ namespace Compiler.Phases
 
         private bool SSTF()
         {
-            if (Tokens[i].Type == Constants.CUR_BRACKET_RIGHT || Tokens[i].Type == Constants.SMALL_BRACKET_RIGHT || Tokens[i].Type == Constants.IF || Tokens[i].Type == Constants.FOR)
+            if (Tokens[i].Type == Constants.CUR_BRACKET_RIGHT || Tokens[i].Type == Constants.SMALL_BRACKET_RIGHT || SSTS())
             {
                 return true;
             }
@@ -395,6 +597,13 @@ namespace Compiler.Phases
                     }
                     return ThrowSyntaxError(Constants.TERMINATOR);
                 }
+                if (Tokens[i].Type == Constants.SQUARE_BRACKET_LEFT)
+                {
+                    if (ARRAY_DECLARATION())
+                    {
+                        return true;
+                    }
+                }
                 return ThrowSyntaxError(Constants.IDENTIFIER);
             }
             return ThrowSyntaxError(Constants.DATA_TYPE);
@@ -428,7 +637,127 @@ namespace Compiler.Phases
                         return true;
                     }
                 }
+                if (Tokens[i].Type == Constants.TERMINATOR)
+                {
+                    i++;
+                    return true;
+                }
+                return ThrowSyntaxError(Constants.TERMINATOR);
+            }
+            return ThrowSyntaxError(Constants.IDENTIFIER);
+        }
 
+        private bool ARRAY_DECLARATION()
+        {
+            if (Tokens[i].Type == Constants.SQUARE_BRACKET_LEFT)
+            {
+                i++;
+                if (Tokens[i].Type == Constants.SQUARE_BRACKET_RIGHT)
+                {
+                    i++;
+                    if (Tokens[i].Type == Constants.IDENTIFIER)
+                    {
+                        i++;
+                        if (Tokens[i].Type == Constants.EQUAL)
+                        {
+                            i++;
+
+                            if (Tokens[i].Type == Constants.NEW)
+                            {
+                                i++;
+                                if (Tokens[i].Type == Constants.DATA_TYPE)
+                                {
+                                    i++;
+                                    if (Tokens[i].Type == Constants.SQUARE_BRACKET_LEFT)
+                                    {
+                                        i++;
+                                        if (E())
+                                        {
+                                            if (Tokens[i].Type == Constants.SQUARE_BRACKET_RIGHT)
+                                            {
+                                                i++;
+                                                if (Tokens[i].Type == Constants.TERMINATOR)
+                                                {
+                                                    i++;
+                                                    return true;
+                                                }
+                                                return ThrowSyntaxError(Constants.TERMINATOR);
+                                            }
+                                            return ThrowSyntaxError(Constants.SQUARE_BRACKET_RIGHT);
+                                        }
+                                    }
+                                    return ThrowSyntaxError(Constants.SQUARE_BRACKET_LEFT);
+                                }
+                                return ThrowSyntaxError(Constants.DATA_TYPE);
+                            }
+                            return ThrowSyntaxError(Constants.NEW);
+                        }
+                        if (Tokens[i].Type == Constants.COMMA)
+                        {
+                            i++;
+                            if (ARRAY_DECLARATION_1())
+                            {
+                                return true;
+                            }
+                        }
+                        if (Tokens[i].Type == Constants.TERMINATOR)
+                        {
+                            i++;
+                            return true;
+                        }
+                        return ThrowSyntaxError(Constants.TERMINATOR);
+                    }
+                }
+            }
+            return false;
+        }
+
+        private bool ARRAY_DECLARATION_1()
+        {
+            if (Tokens[i].Type == Constants.IDENTIFIER)
+            {
+                i++;
+                if (Tokens[i].Type == Constants.EQUAL)
+                {
+                    i++;
+                    if (Tokens[i].Type == Constants.NEW)
+                    {
+                        i++;
+                        if (Tokens[i].Type == Constants.DATA_TYPE)
+                        {
+                            i++;
+                            if (Tokens[i].Type == Constants.SQUARE_BRACKET_LEFT)
+                            {
+                                i++;
+                                if (E())
+                                {
+                                    if (Tokens[i].Type == Constants.SQUARE_BRACKET_RIGHT)
+                                    {
+                                        i++;
+                                        if (Tokens[i].Type == Constants.TERMINATOR)
+                                        {
+                                            i++;
+                                            return true;
+                                        }
+                                        return ThrowSyntaxError(Constants.TERMINATOR);
+                                    }
+                                    return ThrowSyntaxError(Constants.SQUARE_BRACKET_RIGHT);
+                                }
+                            }
+                            return ThrowSyntaxError(Constants.SQUARE_BRACKET_LEFT);
+                        }
+                        return ThrowSyntaxError(Constants.DATA_TYPE);
+                    }
+                    return ThrowSyntaxError(Constants.NEW);
+                }
+                if (Tokens[i].Type == Constants.COMMA)
+                {
+                    i++;
+                    if (VARIABLE_DECLARATION_1())
+                    {
+                        return true;
+                    }
+                }
                 if (Tokens[i].Type == Constants.TERMINATOR)
                 {
                     i++;
@@ -451,12 +780,12 @@ namespace Compiler.Phases
                     }
                 }
             }
-            return ThrowSyntaxError("Expresiion");
+            return ThrowSyntaxError("Expresion");
         }
 
         private bool E0()
         {
-            if (Tokens[i].Type == Constants.IDENTIFIER || Tokens[i].Type == Constants.SMALL_BRACKET_LEFT || Tokens[i].Type == Constants.INC || Tokens[i].Type == Constants.DEC || Tokens[i].Type == Constants.NOT || Tokens[i].Type == Constants.INT_CONSTANT || Tokens[i].Type == Constants.FLOAT_CONSTANT || Tokens[i].Type == Constants.BOOL_CONSTANT || Tokens[i].Type == Constants.STRING_CONSTANT || Tokens[i].Type == Constants.CHAR_CONSTANT)
+            if (Tokens[i].Type == Constants.IDENTIFIER || Tokens[i].Type == Constants.SMALL_BRACKET_LEFT || Tokens[i].Type == Constants.SQUARE_BRACKET_LEFT || Tokens[i].Type == Constants.INC || Tokens[i].Type == Constants.DEC || Tokens[i].Type == Constants.NOT || Tokens[i].Type == Constants.INT_CONSTANT || Tokens[i].Type == Constants.FLOAT_CONSTANT || Tokens[i].Type == Constants.BOOL_CONSTANT || Tokens[i].Type == Constants.STRING_CONSTANT || Tokens[i].Type == Constants.CHAR_CONSTANT)
             {
                 return true;
             }
@@ -485,7 +814,7 @@ namespace Compiler.Phases
 
         private bool EF()
         {
-            if (Tokens[i].Type == Constants.TERMINATOR || Tokens[i].Type == Constants.COMMA || Tokens[i].Type == Constants.SMALL_BRACKET_RIGHT)
+            if (Tokens[i].Type == Constants.TERMINATOR || Tokens[i].Type == Constants.COMMA || Tokens[i].Type == Constants.SMALL_BRACKET_RIGHT || Tokens[i].Type == Constants.SQUARE_BRACKET_RIGHT)
             {
                 return true;
             }
@@ -779,6 +1108,25 @@ namespace Compiler.Phases
                     return true;
                 }
             }
+            else if (Tokens[i].Type == Constants.SMALL_BRACKET_LEFT)
+            {
+                if (METHOD_CALL())
+                {
+                    return true;
+                }
+            }
+            else if (Tokens[i].Type == Constants.SQUARE_BRACKET_LEFT)
+            {
+                i++;
+                if (E())
+                {
+                    if (Tokens[i].Type == Constants.SQUARE_BRACKET_RIGHT)
+                    {
+                        i++;
+                        return true;
+                    }
+                }
+            }
             else if (KF())
             {
                 return true;
@@ -833,6 +1181,28 @@ namespace Compiler.Phases
                 return ThrowSyntaxError("Expresion");
             }
 
+            if (Tokens[i].Type == Constants.SQUARE_BRACKET_LEFT)
+            {
+                i++;
+                if (E())
+                {
+                    if (Tokens[i].Type == Constants.SQUARE_BRACKET_RIGHT)
+                    {
+                        i++;
+                        if (Tokens[i].Type == Constants.EQUAL)
+                        {
+                            i++;
+                            if (E())
+                            {
+                                return true;
+                            }
+                        }
+                        return ThrowSyntaxError(Constants.SQUARE_BRACKET_RIGHT);
+                    }
+                    return ThrowSyntaxError(Constants.SQUARE_BRACKET_RIGHT);
+                }
+            }
+
             return false;
         }
 
@@ -870,6 +1240,7 @@ namespace Compiler.Phases
                     {
                         if (Tokens[i].Type == Constants.SMALL_BRACKET_RIGHT)
                         {
+                            i++;
                             return true;
                         }
                         return ThrowSyntaxError(Constants.SMALL_BRACKET_RIGHT);
@@ -898,7 +1269,7 @@ namespace Compiler.Phases
 
         private bool METHOD_CALL_PARM_LIST_1()
         {
-            if (Tokens[i].Value == Constants.COMMA)
+            if (Tokens[i].Type == Constants.COMMA)
             {
                 i++;
                 if (E())
@@ -910,7 +1281,7 @@ namespace Compiler.Phases
                 }
                 return ThrowSyntaxError("Expression");
             }
-            else if (Tokens[i].Value == Constants.SMALL_BRACKET_RIGHT)
+            else if (Tokens[i].Type == Constants.SMALL_BRACKET_RIGHT)
             {
                 return true;
             }

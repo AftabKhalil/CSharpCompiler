@@ -128,7 +128,7 @@ namespace Compiler.Phases
                     }
                 }
                 //If we get { } ( ) etc generate token and also directly generate token for them
-                else if (c == '{' || c == '}' || c == '(' || c == ')' || c == '*')
+                else if (c == '{' || c == '}' || c == '(' || c == ')' || c == '[' || c == ']' || c == '*')
                 {
                     GenerateToken(word, lineNo);
                     word = "";
@@ -137,54 +137,60 @@ namespace Compiler.Phases
                 //If its a + we check for next char to confirm if its a ++ or += or not
                 else if (c == '+')
                 {
+                    if (text[i - 1] == 'e')
+                    {
+                        word += c.ToString();
+                        continue;
+                    }
+
+                    GenerateToken(word, lineNo);
+                    word = "";
+
                     i++;
                     c = text[i];
                     if (c == '+')
                     {
-                        GenerateToken(word, lineNo);
-                        word = "";
-
                         //If the next char is also + generate token for ++
                         GenerateToken("++", lineNo);
                     }
                     else if (c == '=')
                     {
-                        GenerateToken(word, lineNo);
-                        word = "";
-
                         //If the next char is = generate token for +=
                         GenerateToken("+=", lineNo);
                     }
                     else
                     {
-                        word = word + "+";
+                        GenerateToken("+", lineNo);
                         i--;//reset identification char
                     }
                 }
                 //If its a + we check for next char to confirm if its a ++ or += or not
                 else if (c == '-')
                 {
+                    if (text[i - 1] == 'e')
+                    {
+                        word += c.ToString();
+                        continue;
+                    }
+
+                    GenerateToken(word, lineNo);
+                    word = "";
+
                     i++;
                     c = text[i];
-                    if (c == '-')
+                    if (c == 'i')
                     {
-                        GenerateToken(word, lineNo);
-                        word = "";
-
                         //If the next char is also + generate token for ++
                         GenerateToken("--", lineNo);
                     }
                     else if (c == '=')
                     {
-                        GenerateToken(word, lineNo);
-                        word = "";
-
                         //If the next char is = generate token for +=
                         GenerateToken("-=", lineNo);
                     }
                     else
                     {
-                        word = word + "-";
+                        GenerateToken("-", lineNo);
                         i--;//reset identification char
                     }
                 }
@@ -226,9 +232,7 @@ namespace Compiler.Phases
                 else if (c == '\'')
                 {
                     GenerateToken(word, lineNo);
-
                     word = "'";
-
                     //if it is a ' it means we are expecting a char we just need to read the next char if its \ its means its a special character
 
                     i++;
@@ -260,6 +264,8 @@ namespace Compiler.Phases
                 //If we got / it could be divide or a comment 
                 else if (c == '/')
                 {
+                    GenerateToken(word, lineNo);
+                    word = "";
                     //Imidiately read the next char
                     i++;
                     c = text[i];
@@ -274,6 +280,7 @@ namespace Compiler.Phases
                             c = text[i];
                         }
                         i++;//skip End Of Line char
+                        lineNo++;
                     }
                     //If the next char we read is also a * its means we got /* i.e // its a multiline comment skip code till we get */                    else if (c == '*')
                     else if (c == '*')
@@ -282,6 +289,10 @@ namespace Compiler.Phases
                         c = text[i];
                         while (true)
                         {
+                            if (c == '\n')
+                            {
+                                lineNo++;
+                            }
                             if (c == '*')
                             {
                                 i++;
@@ -398,7 +409,11 @@ namespace Compiler.Phases
                 case "while": return new Tuple<string, string>(Constants.WHILE, Constants.WHILE);
                 case "for": return new Tuple<string, string>(Constants.FOR, Constants.FOR);
 
+                case "new": return new Tuple<string, string>(Constants.NEW, Constants.NEW);
+                case "break": return new Tuple<string, string>(Constants.BREAK, Constants.BREAK);
+                case "return": return new Tuple<string, string>(Constants.RETURN, Constants.RETURN);
                 case "void": return new Tuple<string, string>(Constants.VOID, Constants.VOID);
+                case "print": return new Tuple<string, string>(Constants.PRINT, Constants.PRINT);
 
                 default: return null;
             }
@@ -427,12 +442,13 @@ namespace Compiler.Phases
                 case "-": return new Tuple<string, string>(Constants.ADDSUB, Constants.MINUS);
                 case "*": return new Tuple<string, string>(Constants.DIVMUL, Constants.MULTIPLY);
                 case "/": return new Tuple<string, string>(Constants.DIVMUL, Constants.DIVIDE);
-                //We will add new symbols when needed
 
                 case "{": return new Tuple<string, string>(Constants.CUR_BRACKET_LEFT, Constants.CUR_BRACKET_LEFT);
                 case "}": return new Tuple<string, string>(Constants.CUR_BRACKET_RIGHT, Constants.CUR_BRACKET_RIGHT);
                 case "(": return new Tuple<string, string>(Constants.SMALL_BRACKET_LEFT, Constants.SMALL_BRACKET_LEFT);
                 case ")": return new Tuple<string, string>(Constants.SMALL_BRACKET_RIGHT, Constants.SMALL_BRACKET_RIGHT);
+                case "[": return new Tuple<string, string>(Constants.SQUARE_BRACKET_LEFT, Constants.SQUARE_BRACKET_LEFT);
+                case "]": return new Tuple<string, string>(Constants.SQUARE_BRACKET_RIGHT, Constants.SQUARE_BRACKET_RIGHT);
 
                 case "<": return new Tuple<string, string>(Constants.RELATIONAL_OPERATION, Constants.LESS_THAN);
                 case "<=": return new Tuple<string, string>(Constants.RELATIONAL_OPERATION, Constants.LESS_THAN_EQU);
@@ -441,14 +457,12 @@ namespace Compiler.Phases
                 case "==": return new Tuple<string, string>(Constants.RELATIONAL_OPERATION, Constants.EQU_TO_EQU_TO);
                 case "!=": return new Tuple<string, string>(Constants.RELATIONAL_OPERATION, Constants.NOT_EQU_TO);
 
-
                 case "++": return new Tuple<string, string>(Constants.INC_DEC, Constants.INC);
                 case "--": return new Tuple<string, string>(Constants.INC_DEC, Constants.DEC);
 
                 case "+=": return new Tuple<string, string>(Constants.ASSIGNMENT_OPERATOR, Constants.INC_EQU);
                 case "-=": return new Tuple<string, string>(Constants.ASSIGNMENT_OPERATOR, Constants.DEC_EQU);
 
-                //return null if its not a symbol
                 default: return null;
             }
         }

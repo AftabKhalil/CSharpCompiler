@@ -1,0 +1,12 @@
+C:\Users\akhalil\source\repos\Compiler\Compiler\bin\Debug\netcoreapp1.0\Compiler.deps.json
+C:\Users\akhalil\source\repos\Compiler\Compiler\bin\Debug\netcoreapp1.0\Compiler.runtimeconfig.json
+C:\Users\akhalil\source\repos\Compiler\Compiler\bin\Debug\netcoreapp1.0\Compiler.runtimeconfig.dev.json
+C:\Users\akhalil\source\repos\Compiler\Compiler\bin\Debug\netcoreapp1.0\Compiler.dll
+C:\Users\akhalil\source\repos\Compiler\Compiler\bin\Debug\netcoreapp1.0\Compiler.pdb
+C:\Users\akhalil\source\repos\Compiler\Compiler\obj\Debug\netcoreapp1.0\Compiler.csprojAssemblyReference.cache
+C:\Users\akhalil\source\repos\Compiler\Compiler\obj\Debug\netcoreapp1.0\Compiler.csproj.CoreCompileInputs.cache
+C:\Users\akhalil\source\repos\Compiler\Compiler\obj\Debug\netcoreapp1.0\Compiler.AssemblyInfoInputs.cache
+C:\Users\akhalil\source\repos\Compiler\Compiler\obj\Debug\netcoreapp1.0\Compiler.AssemblyInfo.cs
+C:\Users\akhalil\source\repos\Compiler\Compiler\obj\Debug\netcoreapp1.0\Compiler.dll
+C:\Users\akhalil\source\repos\Compiler\Compiler\obj\Debug\netcoreapp1.0\Compiler.pdb
+C:\Users\akhalil\source\repos\Compiler\Compiler\obj\Debug\netcoreapp1.0\Compiler.genruntimeconfig.cache

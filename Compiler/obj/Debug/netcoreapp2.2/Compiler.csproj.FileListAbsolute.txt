@@ -8,3 +8,5 @@ C:\Users\akhalil\source\repos\Compiler\Compiler\obj\Debug\netcoreapp2.2\Compiler
 C:\Users\akhalil\source\repos\Compiler\Compiler\obj\Debug\netcoreapp2.2\Compiler.AssemblyInfo.cs
 C:\Users\akhalil\source\repos\Compiler\Compiler\obj\Debug\netcoreapp2.2\Compiler.dll
 C:\Users\akhalil\source\repos\Compiler\Compiler\obj\Debug\netcoreapp2.2\Compiler.pdb
+C:\Users\akhalil\source\repos\Compiler\Compiler\obj\Debug\netcoreapp2.2\Compiler.csprojAssemblyReference.cache
+C:\Users\akhalil\source\repos\Compiler\Compiler\obj\Debug\netcoreapp2.2\Compiler.genruntimeconfig.cache
